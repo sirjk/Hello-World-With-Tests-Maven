@@ -1,3 +1,3 @@
 FROM builder:latest
 
-RUN mvn test
+CMD ['sh','-c', 'mvn -f inputVol/Hello-World-With-Tests-Maven/ test']

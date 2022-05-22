@@ -37,5 +37,19 @@ pipeline {
                 sh 'docker run --mount source=vol-out,destination=/outputVol deploy:latest'
             }
         }
+        stage('Publish') {
+            steps {
+                echo 'Publishing..'
+                script{
+                    if(parameters.promote){
+                        sh 'mv ./artifact/SimpleApp.jar ./artifact/SimpleApp-${version}.jar'
+                        archiveArtifacts artifacts: 'artifact/SimpleApp-${version}.jar'
+                    }
+                    else{
+                        echo 'Pipeline finished work sucessfully but new version wasn\'t published.'
+                    }
+                }
+            }
+        }
     }
 }

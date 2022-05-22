@@ -34,6 +34,8 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying....'
+                sh 'docker build -t deploy:latest . -f /var/jenkins_home/workspace/DevOpsPipeline/docker-deploy'
+                sh 'docker run --mount source=vol-in,destination=/inputVol --mount source=vol-out,destination=/outputVol deploy:latest'
             }
         }
     }

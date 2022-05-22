@@ -5,10 +5,9 @@ pipeline {
         stage('Clone'){
             steps {
                 echo 'Cloning.. And setting up voulumes..'
-
+                sh 'docker system prune --all -f'
                 sh 'docker volume create vol-in'
                 sh 'docker volume create vol-out'
-
                 sh 'docker build -t cloner:latest . -f /var/jenkins_home/workspace/DevOpsPipeline/docker-clone'
                 sh 'docker run --mount source=vol-in,destination=/inputVol cloner:latest'
             }
@@ -35,7 +34,7 @@ pipeline {
             steps {
                 echo 'Deploying....'
                 sh 'docker build -t deploy:latest . -f /var/jenkins_home/workspace/DevOpsPipeline/docker-deploy'
-                sh 'docker run --mount source=vol-in,destination=/inputVol --mount source=vol-out,destination=/outputVol deploy:latest'
+                sh 'docker run --mount source=vol-out,destination=/outputVol deploy:latest'
             }
         }
     }

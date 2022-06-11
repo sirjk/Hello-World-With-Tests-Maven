@@ -2,9 +2,9 @@ pipeline {
     agent any
     
     parameters{
-		string(name:'version',defaultValue:'1.0.0', description:'The version of artifact')
-		booleanParam(name:'promote',defaultValue: false, description:'Publish new version')
-	}
+	string(name:'version',defaultValue:'1.0.0', description:'The version of artifact')
+	booleanParam(name:'promote',defaultValue: false, description:'Publish new version')
+    }
 
     stages {
         stage('Clone'){
@@ -41,17 +41,17 @@ pipeline {
                 sh 'docker build -t deploy:latest . -f /var/jenkins_home/workspace/DevOpsPipeline/docker-deploy'
                 sh 'docker run --name deploy-container --mount source=vol-out,destination=/outputVol deploy:latest'
                 sh 'rm -rf artifact'
-				sh 'mkdir artifact'
-				sh 'docker cp deploy-container:outputVol/SimpleApp.jar ./artifact'
+		sh 'mkdir artifact'
+		sh 'docker cp deploy-container:outputVol/SimpleApp.jar ./artifact'
             }
         }
         stage('Publish') {
             steps {
                 echo 'Publishing..'
                 script{
-                    if(parameters.promote){
-                        sh 'mv ./artifact/SimpleApp.jar ./artifact/SimpleApp-${version}.jar'
-                        archiveArtifacts artifacts: 'artifact/SimpleApp-${version}.jar'
+                    if(params.promote){
+                        sh "mv ./artifact/SimpleApp.jar ./artifact/SimpleApp-${params.version}.jar"
+                        archiveArtifacts artifacts: "artifact/SimpleApp-${params.version}.jar"
                     }
                     else{
                         echo 'Pipeline finished work sucessfully but new version wasn\'t published.'

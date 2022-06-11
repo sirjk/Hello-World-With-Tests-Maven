@@ -1,5 +1,10 @@
 pipeline {
     agent any
+    
+    parameters{
+		string(name:'version',defaultValue:'1.0.0', description:'The version of artifact')
+		booleanParam(name:'promote',defaultValue: false, description:'Publish new version')
+	}
 
     stages {
         stage('Clone'){
@@ -34,7 +39,10 @@ pipeline {
             steps {
                 echo 'Deploying....'
                 sh 'docker build -t deploy:latest . -f /var/jenkins_home/workspace/DevOpsPipeline/docker-deploy'
-                sh 'docker run --mount source=vol-out,destination=/outputVol deploy:latest'
+                sh 'docker run --name deploy-container --mount source=vol-out,destination=/outputVol deploy:latest'
+                sh 'rm -rf artifact'
+				sh 'mkdir artifact'
+				sh 'docker cp deploy-container:outputVol/SimpleApp.jar ./artifact'
             }
         }
         stage('Publish') {
